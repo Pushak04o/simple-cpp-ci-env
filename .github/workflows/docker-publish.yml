@@ -13,6 +13,14 @@ permissions:
 jobs:
   push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - tag: clang22
+            compiler: clang
+          - tag: gcc16
+            compiler: gcc
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,11 +40,15 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ matrix.tag }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
+          build-args: |
+            DEFAULT_COMPILER=${{ matrix.compiler }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
