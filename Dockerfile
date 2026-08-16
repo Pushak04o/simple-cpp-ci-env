@@ -26,7 +26,7 @@ RUN if [ "$DEFAULT_COMPILER" = "gcc" ]; then \
     else \
         wget -q https://apt.llvm.org/llvm.sh -O /tmp/llvm.sh && \
         chmod +x /tmp/llvm.sh && \
-        /tmp/llvm.sh 22 && \
+        /tmp/llvm.sh 22 all && \
         rm /tmp/llvm.sh && \
         update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 100 && \
         update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 100 && \
