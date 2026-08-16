@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     git \
     ninja-build \
     cmake \
+    ccache \
     && rm -rf /var/lib/apt/lists/*
 
 # GCC 16
@@ -24,8 +25,21 @@ RUN wget https://apt.llvm.org/llvm.sh && \
     rm llvm.sh && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y ccache && rm -rf /var/lib/apt/lists/*
+# Aliases
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 100 \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 100 \
+    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-16 100
 
+ARG DEFAULT_COMPILER=clang
+
+# Choose default compiler
+RUN if [ "$DEFAULT_COMPILER" = "gcc" ]; then \
+        update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-16 100 \
+        && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-16 100; \
+    else \
+        update-alternatives --install /usr/bin/cc cc /usr/bin/clang-22 100 \
+        && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-22 100; \
+    fi
 WORKDIR /workspace
-
 
